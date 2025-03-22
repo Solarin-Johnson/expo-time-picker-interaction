@@ -1,9 +1,11 @@
-import { Link, Stack } from "expo-router";
-import { StyleSheet } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
+import { Stack } from "expo-router";
+import { PixelRatio, StyleSheet, TouchableOpacity, View } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { X } from "lucide-react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { allFilters } from "@/constants";
+import FilterOption from "@/components/ui/FilterOption";
+import { useState } from "react";
 
 export default function Index() {
   const backgroundColor = useThemeColor({}, "background");
@@ -19,26 +21,60 @@ export default function Index() {
           headerStyle: { backgroundColor },
         }}
       />
-      <ThemedView style={styles.container}></ThemedView>
+      <ThemedView style={styles.container}>
+        <Filter />
+      </ThemedView>
     </>
   );
 }
 
-const HeaderButton = () => {
-  const text = useThemeColor({}, "text");
-  const backgroundColor = useThemeColor({}, "background");
+const Filter = () => {
+  const [selected, setSelected] = useState<number | null>(null);
+
+  const handleSelect = (index: number) => {
+    setSelected((prev) => (prev === index ? null : index));
+  };
 
   return (
-    <ThemedView
+    <View
       style={{
-        marginRight: 15,
-        backgroundColor: text + "10",
-        padding: 8,
-        borderRadius: 50,
+        flex: 1,
+        width: "100%",
+        maxWidth: 540,
+        gap: 12,
+        padding: PixelRatio.getPixelSizeForLayoutSize(10),
       }}
     >
-      <X size={14} color={text + "cd"} strokeWidth={2.5} />
-    </ThemedView>
+      {allFilters.map((filter, i) => (
+        <FilterOption
+          index={i}
+          key={i}
+          {...filter}
+          isSelected={selected === i}
+          onSelect={handleSelect}
+        />
+      ))}
+    </View>
+  );
+};
+
+const HeaderButton = () => {
+  const textFade = useThemeColor({}, "textFade");
+  const backgroundColor = useThemeColor({}, "foreground");
+
+  return (
+    <TouchableOpacity activeOpacity={0.5}>
+      <ThemedView
+        style={{
+          marginRight: 15,
+          backgroundColor,
+          padding: 8,
+          borderRadius: 50,
+        }}
+      >
+        <X size={15} color={textFade} strokeWidth={3} />
+      </ThemedView>
+    </TouchableOpacity>
   );
 };
 
@@ -46,8 +82,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
   },
   link: {
     marginTop: 15,
