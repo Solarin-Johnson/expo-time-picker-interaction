@@ -1,25 +1,25 @@
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { LucideProps } from "lucide-react-native";
-import React, { ComponentType } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import React, { ComponentType, useState } from "react";
+import { View, StyleSheet, Pressable, LayoutChangeEvent } from "react-native";
 import { ThemedText } from "../ThemedText";
 import Animated, {
   useAnimatedStyle,
+  useSharedValue,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { SPRING_CONFIG } from "@/constants";
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
 type FilterOptionProps = {
   index: number;
-  icon: ComponentType<LucideProps>;
+  icon?: ComponentType<LucideProps>;
   label: string;
-  value: string;
+  value?: string;
   valueComponent?: React.ReactNode;
   isSelected: boolean;
   onSelect: (value: number) => void;
+  handleChange?: (index: number, value: string) => void;
   children?: React.ReactNode;
 };
 
@@ -37,10 +37,18 @@ const FilterOption: React.FC<FilterOptionProps> = ({
   const foregroundColor = useThemeColor({}, "foreground");
   const text = useThemeColor({}, "text");
   const textFade = useThemeColor({}, "textFade");
+  const measuredHeight = useSharedValue(0);
+
+  const onLayout = (event: LayoutChangeEvent) => {
+    measuredHeight.value = event.nativeEvent.layout.height;
+  };
 
   const animatedContainerStyle = useAnimatedStyle(() => {
     return {
-      height: withSpring(isSelected ? 248 : 58, SPRING_CONFIG),
+      height: withSpring(
+        isSelected ? measuredHeight.value + 58 + 10 : 58,
+        SPRING_CONFIG
+      ),
     };
   }, [isSelected]);
 
@@ -69,7 +77,8 @@ const FilterOption: React.FC<FilterOptionProps> = ({
         {icon && (
           <View style={styles.iconContainer}>
             {React.createElement(icon, {
-              size: 18,
+              size: 19,
+              strokeWidth: 1.9,
               color: textFade,
             })}
           </View>
@@ -81,6 +90,7 @@ const FilterOption: React.FC<FilterOptionProps> = ({
               color: textFade,
             },
           ]}
+          type="subtitle"
         >
           {label}
         </ThemedText>
@@ -93,6 +103,7 @@ const FilterOption: React.FC<FilterOptionProps> = ({
                   color: value ? text : textFade,
                 },
               ]}
+              type={value ? "default" : "subtitle"}
             >
               {value || `All ${label.toLowerCase()}`}
             </ThemedText>
@@ -103,10 +114,11 @@ const FilterOption: React.FC<FilterOptionProps> = ({
         style={[
           styles.childrenContainer,
           {
-            backgroundColor,
+            backgroundColor: backgroundColor + "99",
           },
           animatedChildrenStyle,
         ]}
+        onLayout={onLayout}
       >
         {children}
       </View>
@@ -146,7 +158,7 @@ const styles = StyleSheet.create({
   childrenContainer: {
     margin: 5,
     borderRadius: 10,
-    height: 180,
+    height: 120,
   },
 });
 

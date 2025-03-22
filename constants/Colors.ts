@@ -11,7 +11,8 @@ export const Colors = {
     text: "#11181C",
     textFade: "#212120",
     background: "#fff",
-    foreground: "#f9f9f9",
+    foreground: "#f6f6f6",
+    accent: "#0E61FF",
     tint: tintColorLight,
   },
   dark: {
@@ -19,6 +20,7 @@ export const Colors = {
     textFade: "#919191",
     background: "#131312",
     foreground: "#212120",
+    accent: "#0E61FF",
     tint: tintColorDark,
   },
 };

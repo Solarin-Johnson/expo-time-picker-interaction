@@ -64,6 +64,6 @@ export const filterConfigs: Record<string, FilterItem> = {
 export const allFilters = Object.values(filterConfigs);
 
 export const SPRING_CONFIG = {
-  damping: 50,
-  stiffness: 250,
+  damping: 40,
+  stiffness: 300,
 };
