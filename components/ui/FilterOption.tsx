@@ -16,7 +16,8 @@ type FilterOptionProps = {
   icon?: ComponentType<LucideProps>;
   label: string;
   value?: string;
-  valueComponent?: React.ReactNode;
+  valueComponent?: ComponentType;
+  valueComponentProps?: Record<string, any>;
   isSelected: boolean;
   onSelect: (value: number) => void;
   handleChange?: (index: number, value: string) => void;
@@ -32,11 +33,13 @@ const FilterOption: React.FC<FilterOptionProps> = ({
   onSelect,
   icon,
   children,
+  valueComponentProps,
 }) => {
   const backgroundColor = useThemeColor({}, "background");
   const foregroundColor = useThemeColor({}, "foreground");
   const text = useThemeColor({}, "text");
   const textFade = useThemeColor({}, "textFade");
+
   const measuredHeight = useSharedValue(0);
 
   const onLayout = (event: LayoutChangeEvent) => {
@@ -95,7 +98,9 @@ const FilterOption: React.FC<FilterOptionProps> = ({
           {label}
         </ThemedText>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
-          {valueComponent ?? (
+          {value && valueComponent ? (
+            React.createElement(valueComponent, valueComponentProps)
+          ) : (
             <ThemedText
               style={[
                 styles.label,

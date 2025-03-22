@@ -10,11 +10,11 @@ import {
 import { ThemedView } from "@/components/ThemedView";
 import { X } from "lucide-react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { allFilters } from "@/constants";
 import FilterOption from "@/components/ui/FilterOption";
 import { useState } from "react";
 import { ThemedText } from "@/components/ThemedText";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { allFilters } from "@/constants/filterConfigs";
 
 export default function Index() {
   const backgroundColor = useThemeColor({}, "background");
