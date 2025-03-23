@@ -26,7 +26,7 @@ export default function TimePicker({ handleChange, value }: ChildProps) {
   const scrollY = useSharedValue(Number(value));
 
   const derivedMinutes = useDerivedValue(() => {
-    return Math.round(((scrollY.value / TIME_VIEW_HEIGHT) * 30) / 30) * 30;
+    return Math.round(scrollY.value / 30) * 30;
   });
 
   useAnimatedReaction(
@@ -128,8 +128,7 @@ const TimeSelector = ({ scrollY }: { scrollY: SharedValue<number> }) => {
 
   const scrollHandler = useAnimatedScrollHandler({
     onMomentumEnd: (event) => {
-      scrollY.value =
-        Math.round(event.contentOffset.y / TIME_VIEW_HEIGHT) * TIME_VIEW_HEIGHT;
+      scrollY.value = Math.round(event.contentOffset.y / TIME_VIEW_HEIGHT) * 30;
       isScrolling.current = false;
     },
     onScroll: (event) => {
@@ -145,8 +144,7 @@ const TimeSelector = ({ scrollY }: { scrollY: SharedValue<number> }) => {
 
         timeoutId.current = setTimeout(() => {
           scrollY.value =
-            Math.round(event.contentOffset.y / TIME_VIEW_HEIGHT) *
-            TIME_VIEW_HEIGHT;
+            Math.round(event.contentOffset.y / TIME_VIEW_HEIGHT) * 30;
         }, 50);
       }
     },
@@ -165,8 +163,7 @@ const TimeSelector = ({ scrollY }: { scrollY: SharedValue<number> }) => {
         ref={scrollRef}
         contentContainerStyle={{
           paddingVertical:
-            (TIME_VIEW_HEIGHT * VIEWABLE_LENGTH) / 2 -
-            (TIME_VIEW_HEIGHT / VIEWABLE_LENGTH) * 2.5,
+            (TIME_VIEW_HEIGHT / 2) * (VIEWABLE_LENGTH - 5 / VIEWABLE_LENGTH),
           paddingHorizontal: 12,
         }}
         style={styles.timeSelector}
@@ -212,7 +209,6 @@ const TimeView = ({ item }: { item: string }) => {
 
 const styles = StyleSheet.create({
   container: {
-    // height: "auto",
     flexGrow: 1,
     justifyContent: "flex-start",
   },
@@ -234,8 +230,6 @@ const styles = StyleSheet.create({
   },
   timeSelector: {
     maxHeight: TIME_VIEW_HEIGHT * VIEWABLE_LENGTH,
-    // height: 250,
-    // maxHeight: "100%",
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,

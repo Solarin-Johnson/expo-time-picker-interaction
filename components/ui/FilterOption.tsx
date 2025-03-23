@@ -106,7 +106,7 @@ const FilterOption: React.FC<FilterOptionProps> = ({
               color: textFade,
             },
           ]}
-          type="default"
+          type="subtitle"
         >
           {label}
         </ThemedText>
@@ -128,7 +128,7 @@ const FilterOption: React.FC<FilterOptionProps> = ({
                   color: value ? text : textFade,
                 },
               ]}
-              type={"default"}
+              type={"subtitle"}
             >
               {value || `All ${label.toLowerCase()}`}
             </ThemedText>
@@ -161,12 +161,8 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 14,
     overflow: "hidden",
-    // flexGrow: 1,
   },
-  selected: {
-    // backgroundColor: "#007AFF",
-    // height: 150,
-  },
+  selected: {},
   contentContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -174,10 +170,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     height: 58,
     overflow: "hidden",
-    // flexGrow
   },
   label: {
-    fontSize: 14,
     marginLeft: 3,
   },
   selectedText: {

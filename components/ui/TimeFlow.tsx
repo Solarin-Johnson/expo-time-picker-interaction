@@ -51,7 +51,7 @@ const TimeFlowDigit: React.FC<{
     <View style={styles.digitContainer}>
       <Animated.View style={animatedStyle}>
         {[...Array(TOTAL_DIGITS).keys()].map((num) => (
-          <ThemedText key={num} style={[styles.digitText]} type="default">
+          <ThemedText key={num} style={[styles.digitText]} type="subtitle">
             {num === 0 && noPad ? "" : num}
           </ThemedText>
         ))}
@@ -130,7 +130,6 @@ const styles = StyleSheet.create({
   timeFlow: {
     flexDirection: "row",
     alignItems: "center",
-    // opacity: 0.4,
   },
   digitContainer: { height: DIGIT_HEIGHT, overflow: "hidden" },
   digitText: {

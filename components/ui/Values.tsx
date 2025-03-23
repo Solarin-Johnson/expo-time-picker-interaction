@@ -43,7 +43,7 @@ export const FriendsAttendValue: React.FC<ValueComponentProps> = memo(
     useEffect(() => {
       rotation.value = withPause(
         withRepeat(
-          withTiming(360, { duration: 20000, easing: Easing.linear }),
+          withTiming(360, { duration: 10000, easing: Easing.linear }),
           -1,
           false
         ),
@@ -93,7 +93,7 @@ export const FriendsAttendValue: React.FC<ValueComponentProps> = memo(
                     position: "absolute",
                     left: SIZE / 2 + x - IMG_SIZE / 2,
                     top: SIZE / 2 + y - IMG_SIZE / 2,
-                    backgroundColor: `hsl(${(i * 500) / COUNT}, 80%, 80%)`,
+                    backgroundColor: `hsl(${(i * 1200) / COUNT}, 80%, 80%)`,
                     borderRadius: 50,
                   },
                   imageStyle,

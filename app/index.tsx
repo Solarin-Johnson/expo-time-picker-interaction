@@ -183,6 +183,5 @@ const styles = StyleSheet.create({
   button: {
     paddingVertical: 12,
     paddingHorizontal: 6,
-    // backgroundColor: "red",
   },
 });
