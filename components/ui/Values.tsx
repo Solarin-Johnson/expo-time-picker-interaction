@@ -53,7 +53,7 @@ export const FriendsAttendValue: React.FC<ValueComponentProps> = memo(
 
     const ringStyle = useAnimatedStyle(() => {
       return {
-        transform: [{ rotate: `${rotation.value}deg` }],
+        transform: [{ rotate: `-${rotation.value}deg` }],
       };
     });
 
@@ -82,7 +82,7 @@ export const FriendsAttendValue: React.FC<ValueComponentProps> = memo(
             const y = radius * Math.sin((angle * Math.PI) / 180);
 
             const imageStyle = useAnimatedStyle(() => ({
-              transform: [{ rotate: `${-rotation.value}deg` }],
+              transform: [{ rotate: `${rotation.value}deg` }],
             }));
 
             return (
