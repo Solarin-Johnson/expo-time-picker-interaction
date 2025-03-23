@@ -16,7 +16,7 @@ type FilterOptionProps = FilterItem & {
   isSelected: boolean;
   onSelect: (value: number) => void;
   handleChange?: (index: number, value: string) => void;
-  currentSelected?: number | null;
+  selected?: number | null;
 };
 
 export type ChildProps = {
@@ -25,7 +25,8 @@ export type ChildProps = {
 };
 
 export type ValueComponentProps = {
-  value: number | string;
+  value?: any;
+  working?: boolean;
 };
 
 const FilterOption: React.FC<FilterOptionProps> = ({
@@ -33,6 +34,7 @@ const FilterOption: React.FC<FilterOptionProps> = ({
   label,
   value,
   valueComponent,
+  selected,
   isSelected,
   onSelect,
   icon,
@@ -115,6 +117,7 @@ const FilterOption: React.FC<FilterOptionProps> = ({
               {
                 ...valueComponentProps,
                 value,
+                working: !!selected,
               }
             )
           ) : (
@@ -169,7 +172,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 16,
-    minHeight: 58,
+    height: 58,
+    overflow: "hidden",
     // flexGrow
   },
   label: {

@@ -1,6 +1,6 @@
 import { ChildProps } from "@/components/ui/FilterOption";
 import TimePicker from "@/components/ui/TimePicker";
-import { TimeValue } from "@/components/ui/Values";
+import { FriendsAttendValue, TimeValue } from "@/components/ui/Values";
 import {
   CalendarDays,
   CircleDollarSign,
@@ -43,7 +43,8 @@ export const filterConfigs: Record<string, FilterItem> = {
   friendsAttend: {
     icon: UsersRound,
     label: "Friends attend",
-    value: "12+",
+    value: 13,
+    valueComponent: FriendsAttendValue,
   },
 
   time: {
@@ -52,9 +53,6 @@ export const filterConfigs: Record<string, FilterItem> = {
     value: "390",
     child: TimePicker,
     valueComponent: TimeValue,
-    valueComponentProps: {
-      value: 390,
-    },
   },
 
   genres: {

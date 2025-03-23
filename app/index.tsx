@@ -15,7 +15,6 @@ import { useState } from "react";
 import { ThemedText } from "@/components/ThemedText";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { allFilters } from "@/constants/filterConfigs";
-import Animated from "react-native-reanimated";
 
 export default function Index() {
   const backgroundColor = useThemeColor({}, "background");
@@ -75,8 +74,8 @@ const Filter = ({ filters, setFilters }: FilterProps) => {
           {...filter}
           isSelected={selected === i}
           onSelect={handleSelect}
-          currentSelected={selected}
           handleChange={handleChange}
+          selected={selected}
         />
       ))}
     </ScrollView>
