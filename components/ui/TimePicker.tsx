@@ -1,12 +1,4 @@
-import {
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { ChildProps } from "./FilterOption";
 import Animated, {
@@ -14,15 +6,13 @@ import Animated, {
   SharedValue,
   useAnimatedReaction,
   useAnimatedScrollHandler,
-  useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
-  withSpring,
 } from "react-native-reanimated";
 import { ThemedText } from "../ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { CircleCheck } from "lucide-react-native";
-import { MINUTES, minutesTo12HourFormat, SPRING_CONFIG } from "@/constants";
+import { MINUTES, minutesTo12HourFormat } from "@/constants";
 import { LinearGradient } from "expo-linear-gradient";
 import Clock from "./Clock";
 
@@ -133,23 +123,31 @@ const TimeSelector = ({ scrollY }: { scrollY: SharedValue<number> }) => {
   const scrollRef = useRef<Animated.ScrollView>(null);
   const bgFade = useThemeColor({}, "backgroundFade");
 
+  const isScrolling = useRef(false);
+  const timeoutId = useRef<NodeJS.Timeout | null>(null);
+
   const scrollHandler = useAnimatedScrollHandler({
     onMomentumEnd: (event) => {
-      scrollY.value = event.contentOffset.y;
+      scrollY.value =
+        Math.round(event.contentOffset.y / TIME_VIEW_HEIGHT) * TIME_VIEW_HEIGHT;
+      isScrolling.current = false;
     },
     onScroll: (event) => {
       if (isWeb) {
-        let timeoutId: NodeJS.Timeout | null = null;
-
-        if (timeoutId) {
-          clearTimeout(timeoutId);
+        if (!isScrolling.current) {
+          isScrolling.current = true;
+          scrollY.value = event.contentOffset.y;
         }
 
-        timeoutId = setTimeout(() => {
+        if (timeoutId.current) {
+          clearTimeout(timeoutId.current);
+        }
+
+        timeoutId.current = setTimeout(() => {
           scrollY.value =
             Math.round(event.contentOffset.y / TIME_VIEW_HEIGHT) *
             TIME_VIEW_HEIGHT;
-        }, 500);
+        }, 50);
       }
     },
   });
