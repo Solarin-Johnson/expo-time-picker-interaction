@@ -10,18 +10,17 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { SPRING_CONFIG } from "@/constants";
+import { FilterItem } from "@/constants/filterConfigs";
 
-type FilterOptionProps = {
+type FilterOptionProps = FilterItem & {
   index: number;
-  icon?: ComponentType<LucideProps>;
-  label: string;
-  value?: string;
-  valueComponent?: ComponentType;
-  valueComponentProps?: Record<string, any>;
   isSelected: boolean;
   onSelect: (value: number) => void;
   handleChange?: (index: number, value: string) => void;
-  children?: React.ReactNode;
+};
+
+export type ChildProps = {
+  handleChange: (value: string) => void;
 };
 
 const FilterOption: React.FC<FilterOptionProps> = ({
@@ -32,12 +31,15 @@ const FilterOption: React.FC<FilterOptionProps> = ({
   isSelected,
   onSelect,
   icon,
-  children,
   valueComponentProps,
+  child,
+  childProps,
+  handleChange,
 }) => {
   const backgroundColor = useThemeColor({}, "background");
   const foregroundColor = useThemeColor({}, "foreground");
   const text = useThemeColor({}, "text");
+  const [pendingUpdate, setPendingUpdate] = useState<string>(value);
   const textFade = useThemeColor({}, "textFade");
 
   const measuredHeight = useSharedValue(0);
@@ -61,7 +63,14 @@ const FilterOption: React.FC<FilterOptionProps> = ({
         duration: 250,
       }),
     };
-  }, [isSelected, children]);
+  }, [isSelected, child]);
+
+  const handlePress = () => {
+    if (isSelected) {
+      pendingUpdate && handleChange?.(index, pendingUpdate);
+    }
+    onSelect(index);
+  };
 
   return (
     <Animated.View
@@ -73,10 +82,7 @@ const FilterOption: React.FC<FilterOptionProps> = ({
         animatedContainerStyle,
       ]}
     >
-      <Pressable
-        style={styles.contentContainer}
-        onPress={() => onSelect(index)}
-      >
+      <Pressable style={styles.contentContainer} onPress={handlePress}>
         {icon && (
           <View style={styles.iconContainer}>
             {React.createElement(icon, {
@@ -108,7 +114,7 @@ const FilterOption: React.FC<FilterOptionProps> = ({
                   color: value ? text : textFade,
                 },
               ]}
-              type={value ? "default" : "subtitle"}
+              type={"default"}
             >
               {value || `All ${label.toLowerCase()}`}
             </ThemedText>
@@ -125,7 +131,11 @@ const FilterOption: React.FC<FilterOptionProps> = ({
         ]}
         onLayout={onLayout}
       >
-        {children}
+        {child &&
+          React.createElement(child as ComponentType<ChildProps>, {
+            ...childProps,
+            handleChange: (value: string) => setPendingUpdate(value),
+          })}
       </View>
     </Animated.View>
   );
@@ -163,7 +173,7 @@ const styles = StyleSheet.create({
   childrenContainer: {
     margin: 5,
     borderRadius: 10,
-    height: 120,
+    minHeight: 120,
   },
 });
 

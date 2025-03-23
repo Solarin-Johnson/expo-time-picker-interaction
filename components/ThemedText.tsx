@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     lineHeight: 32,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: "InterMedium",
   },
   link: {
