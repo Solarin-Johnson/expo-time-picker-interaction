@@ -1,5 +1,4 @@
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { LucideProps } from "lucide-react-native";
 import React, { ComponentType, useState } from "react";
 import { View, StyleSheet, Pressable, LayoutChangeEvent } from "react-native";
 import { ThemedText } from "../ThemedText";
@@ -21,6 +20,11 @@ type FilterOptionProps = FilterItem & {
 
 export type ChildProps = {
   handleChange: (value: string) => void;
+  value: number | string;
+};
+
+export type ValueComponentProps = {
+  value: number | string;
 };
 
 const FilterOption: React.FC<FilterOptionProps> = ({
@@ -36,7 +40,7 @@ const FilterOption: React.FC<FilterOptionProps> = ({
   childProps,
   handleChange,
 }) => {
-  const backgroundColor = useThemeColor({}, "background");
+  const backgroundFade = useThemeColor({}, "backgroundFade");
   const foregroundColor = useThemeColor({}, "foreground");
   const text = useThemeColor({}, "text");
   const [pendingUpdate, setPendingUpdate] = useState<string>(value);
@@ -66,8 +70,8 @@ const FilterOption: React.FC<FilterOptionProps> = ({
   }, [isSelected, child]);
 
   const handlePress = () => {
-    if (isSelected) {
-      pendingUpdate && handleChange?.(index, pendingUpdate);
+    if (pendingUpdate && isSelected && handleChange) {
+      handleChange(index, pendingUpdate);
     }
     onSelect(index);
   };
@@ -99,13 +103,19 @@ const FilterOption: React.FC<FilterOptionProps> = ({
               color: textFade,
             },
           ]}
-          type="subtitle"
+          type="default"
         >
           {label}
         </ThemedText>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           {value && valueComponent ? (
-            React.createElement(valueComponent, valueComponentProps)
+            React.createElement(
+              valueComponent as ComponentType<ValueComponentProps>,
+              {
+                ...valueComponentProps,
+                value,
+              }
+            )
           ) : (
             <ThemedText
               style={[
@@ -125,7 +135,7 @@ const FilterOption: React.FC<FilterOptionProps> = ({
         style={[
           styles.childrenContainer,
           {
-            backgroundColor: backgroundColor + "99",
+            backgroundColor: backgroundFade,
           },
           animatedChildrenStyle,
         ]}
@@ -135,6 +145,7 @@ const FilterOption: React.FC<FilterOptionProps> = ({
           React.createElement(child as ComponentType<ChildProps>, {
             ...childProps,
             handleChange: (value: string) => setPendingUpdate(value),
+            value,
           })}
       </View>
     </Animated.View>
@@ -174,6 +185,7 @@ const styles = StyleSheet.create({
     margin: 5,
     borderRadius: 10,
     minHeight: 120,
+    overflow: "hidden",
   },
 });
 

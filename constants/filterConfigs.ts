@@ -1,3 +1,4 @@
+import { ChildProps } from "@/components/ui/FilterOption";
 import TimePicker from "@/components/ui/TimePicker";
 import { TimeValue } from "@/components/ui/Values";
 import {
@@ -14,7 +15,7 @@ export interface FilterItem {
   icon: React.ComponentType<LucideProps>;
   label: string;
   value: string;
-  child?: React.ComponentType;
+  child?: React.ComponentType<ChildProps>;
   valueComponent?: React.ComponentType;
   valueComponentProps?: Record<string, any>;
   childProps?: Record<string, any>;
@@ -48,7 +49,7 @@ export const filterConfigs: Record<string, FilterItem> = {
   time: {
     icon: Clock9,
     label: "Time",
-    value: "7:00 pm",
+    value: "390",
     child: TimePicker,
     valueComponent: TimeValue,
     valueComponentProps: {

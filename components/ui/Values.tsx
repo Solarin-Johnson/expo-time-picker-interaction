@@ -10,7 +10,6 @@ export const TimeValue: React.FC<TimeValueProps> = ({ value = 0 }) => {
   const minutes = useSharedValue(0);
   useEffect(() => {
     runOnUI(() => {
-      "worklet";
       minutes.value = value;
     })();
   }, [value]);

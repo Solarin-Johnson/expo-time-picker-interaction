@@ -31,7 +31,7 @@ const TimeFlowDigit: React.FC<{
       transform: [
         {
           translateY: withDelay(
-            delay * 40,
+            delay * 10,
             withSpring(
               interpolate(
                 digit.value,
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     lineHeight: DIGIT_HEIGHT,
   },
   overlay: {
-    height: DIGIT_HEIGHT + 4,
+    height: DIGIT_HEIGHT + 2,
     ...StyleSheet.absoluteFillObject,
     pointerEvents: "none",
   },

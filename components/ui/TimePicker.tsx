@@ -1,23 +1,60 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import React, { useEffect, useRef, useState } from "react";
 import { ChildProps } from "./FilterOption";
 import Animated, {
+  runOnJS,
+  SharedValue,
+  useAnimatedReaction,
   useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
   withSpring,
 } from "react-native-reanimated";
 import { ThemedText } from "../ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { CircleCheck } from "lucide-react-native";
-import { SPRING_CONFIG } from "@/constants";
+import { MINUTES, minutesTo12HourFormat, SPRING_CONFIG } from "@/constants";
+import { LinearGradient } from "expo-linear-gradient";
+import Clock from "./Clock";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const options = ["Single time", "Time range"];
+const TIME_VIEW_HEIGHT = 42;
+const VIEWABLE_LENGTH = 4.5;
 
-export default function TimePicker({ handleChange }: ChildProps) {
+export default function TimePicker({ handleChange, value }: ChildProps) {
+  const scrollY = useSharedValue(Number(value));
+
+  const derivedMinutes = useDerivedValue(() => {
+    return Math.round(((scrollY.value / TIME_VIEW_HEIGHT) * 30) / 30) * 30;
+  });
+
+  useAnimatedReaction(
+    () => derivedMinutes.value,
+    (value) => runOnJS(handleChange)(value.toString())
+  );
+
   return (
     <View style={styles.container}>
       <TimeSelectPane />
-      <Text>TimePicker</Text>
+      <View
+        style={{
+          alignItems: "center",
+          flexDirection: "row",
+          padding: 16,
+          paddingTop: 0,
+        }}
+      >
+        <Clock timeInMinutes={derivedMinutes} />
+        <TimeSelector scrollY={scrollY} value={value} />
+      </View>
     </View>
   );
 }
@@ -75,13 +112,14 @@ const Selector: React.FC<SelectorProps> = ({ label, onSelect, isSelected }) => {
       <Pressable
         style={styles.selector}
         android_ripple={{
-          color: "#ffffff08",
+          color: "#ffffff04",
+          borderless: true,
         }}
         onPress={onSelect}
       >
         {isSelected && (
           <Animated.View style={checkAnimationStyle}>
-            <CircleCheck color={foreground} size={16} fill={accent} />
+            <CircleCheck color={accent} size={16} />
           </Animated.View>
         )}
 
@@ -101,9 +139,85 @@ const Selector: React.FC<SelectorProps> = ({ label, onSelect, isSelected }) => {
   );
 };
 
+const TimeSelector = ({
+  scrollY,
+  value,
+}: {
+  scrollY: SharedValue<number>;
+  value: string | number;
+}) => {
+  const scrollRef = useRef<Animated.ScrollView>(null);
+  const bgFade = useThemeColor({}, "backgroundFade");
+
+  const handleSnap = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    scrollY.value = event.nativeEvent.contentOffset.y;
+  };
+
+  // const scrollToPosition = (y: number) => {
+  //   scrollRef.current?.scrollTo({ y, animated: true });
+  // };
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({
+      y: (scrollY.value * TIME_VIEW_HEIGHT) / 30,
+      animated: false,
+    });
+  }, []);
+  return (
+    <View style={{ flex: 1 }}>
+      <Animated.ScrollView
+        ref={scrollRef}
+        contentContainerStyle={{
+          paddingVertical:
+            (TIME_VIEW_HEIGHT * VIEWABLE_LENGTH) / 2 -
+            (TIME_VIEW_HEIGHT / VIEWABLE_LENGTH) * 2.5,
+          paddingHorizontal: 12,
+        }}
+        style={styles.timeSelector}
+        showsVerticalScrollIndicator={false}
+        snapToInterval={TIME_VIEW_HEIGHT}
+        nestedScrollEnabled={true}
+        onMomentumScrollEnd={handleSnap}
+      >
+        {MINUTES.map((minute, index) => (
+          <TimeView key={index} item={minute.toString()} />
+        ))}
+      </Animated.ScrollView>
+      <LinearGradient
+        colors={[
+          bgFade,
+          bgFade + "cd",
+          "transparent",
+          "transparent",
+          bgFade + "cd",
+          bgFade,
+        ]}
+        style={styles.overlay}
+      />
+    </View>
+  );
+};
+
+const TimeView = ({ item }: { item: string }) => {
+  return (
+    <View
+      style={{
+        height: TIME_VIEW_HEIGHT,
+        justifyContent: "center",
+      }}
+    >
+      <ThemedText style={{ textAlign: "center" }} type="large">
+        {minutesTo12HourFormat(parseInt(item))}
+      </ThemedText>
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
-    height: 250,
+    // height: "auto",
+    flexGrow: 1,
+    justifyContent: "flex-start",
   },
   pane: {
     flexDirection: "row",
@@ -120,5 +234,14 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: 8,
     alignItems: "center",
+  },
+  timeSelector: {
+    maxHeight: TIME_VIEW_HEIGHT * VIEWABLE_LENGTH,
+    // height: 250,
+    // maxHeight: "100%",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    pointerEvents: "none",
   },
 });
