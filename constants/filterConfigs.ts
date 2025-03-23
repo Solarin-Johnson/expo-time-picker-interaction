@@ -14,7 +14,7 @@ import {
 export interface FilterItem {
   icon: React.ComponentType<LucideProps>;
   label: string;
-  value: string;
+  value: any;
   child?: React.ComponentType<ChildProps>;
   valueComponent?: React.ComponentType;
   valueComponentProps?: Record<string, any>;

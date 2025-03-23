@@ -16,6 +16,7 @@ type FilterOptionProps = FilterItem & {
   isSelected: boolean;
   onSelect: (value: number) => void;
   handleChange?: (index: number, value: string) => void;
+  currentSelected?: number | null;
 };
 
 export type ChildProps = {

@@ -75,6 +75,7 @@ const Filter = ({ filters, setFilters }: FilterProps) => {
           {...filter}
           isSelected={selected === i}
           onSelect={handleSelect}
+          currentSelected={selected}
           handleChange={handleChange}
         />
       ))}

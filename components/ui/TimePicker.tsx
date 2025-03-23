@@ -1,6 +1,7 @@
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -12,6 +13,7 @@ import Animated, {
   runOnJS,
   SharedValue,
   useAnimatedReaction,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -24,9 +26,10 @@ import { MINUTES, minutesTo12HourFormat, SPRING_CONFIG } from "@/constants";
 import { LinearGradient } from "expo-linear-gradient";
 import Clock from "./Clock";
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const isWeb = Platform.OS === "web";
+
 const options = ["Single time", "Time range"];
-const TIME_VIEW_HEIGHT = 42;
+const TIME_VIEW_HEIGHT = 36;
 const VIEWABLE_LENGTH = 4.5;
 
 export default function TimePicker({ handleChange, value }: ChildProps) {
@@ -48,12 +51,13 @@ export default function TimePicker({ handleChange, value }: ChildProps) {
         style={{
           alignItems: "center",
           flexDirection: "row",
-          padding: 16,
+          padding: 12,
+          paddingBottom: 16,
           paddingTop: 0,
         }}
       >
         <Clock timeInMinutes={derivedMinutes} />
-        <TimeSelector scrollY={scrollY} value={value} />
+        <TimeSelector scrollY={scrollY} />
       </View>
     </View>
   );
@@ -90,16 +94,6 @@ const Selector: React.FC<SelectorProps> = ({ label, onSelect, isSelected }) => {
   const accent = useThemeColor({}, "accent");
   const foreground = useThemeColor({}, "foreground");
 
-  const checkAnimationStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          scale: withSpring(isSelected ? 1 : 0, SPRING_CONFIG),
-        },
-      ],
-    };
-  });
-
   return (
     <View
       style={[
@@ -117,11 +111,7 @@ const Selector: React.FC<SelectorProps> = ({ label, onSelect, isSelected }) => {
         }}
         onPress={onSelect}
       >
-        {isSelected && (
-          <Animated.View style={checkAnimationStyle}>
-            <CircleCheck color={accent} size={16} />
-          </Animated.View>
-        )}
+        {isSelected && <CircleCheck color={accent} size={16} />}
 
         <ThemedText
           type="subtitle"
@@ -139,23 +129,30 @@ const Selector: React.FC<SelectorProps> = ({ label, onSelect, isSelected }) => {
   );
 };
 
-const TimeSelector = ({
-  scrollY,
-  value,
-}: {
-  scrollY: SharedValue<number>;
-  value: string | number;
-}) => {
+const TimeSelector = ({ scrollY }: { scrollY: SharedValue<number> }) => {
   const scrollRef = useRef<Animated.ScrollView>(null);
   const bgFade = useThemeColor({}, "backgroundFade");
 
-  const handleSnap = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    scrollY.value = event.nativeEvent.contentOffset.y;
-  };
+  const scrollHandler = useAnimatedScrollHandler({
+    onMomentumEnd: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+    onScroll: (event) => {
+      if (isWeb) {
+        let timeoutId: NodeJS.Timeout | null = null;
 
-  // const scrollToPosition = (y: number) => {
-  //   scrollRef.current?.scrollTo({ y, animated: true });
-  // };
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+
+        timeoutId = setTimeout(() => {
+          scrollY.value =
+            Math.round(event.contentOffset.y / TIME_VIEW_HEIGHT) *
+            TIME_VIEW_HEIGHT;
+        }, 500);
+      }
+    },
+  });
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -163,6 +160,7 @@ const TimeSelector = ({
       animated: false,
     });
   }, []);
+
   return (
     <View style={{ flex: 1 }}>
       <Animated.ScrollView
@@ -177,7 +175,8 @@ const TimeSelector = ({
         showsVerticalScrollIndicator={false}
         snapToInterval={TIME_VIEW_HEIGHT}
         nestedScrollEnabled={true}
-        onMomentumScrollEnd={handleSnap}
+        decelerationRate="normal"
+        onScroll={scrollHandler}
       >
         {MINUTES.map((minute, index) => (
           <TimeView key={index} item={minute.toString()} />
